@@ -1,56 +1,76 @@
-﻿namespace EjercicioClase3Modulo2EFCore
+﻿using EjercicioClase3Modulo2EFCore.Data;
+using EjercicioClase3Modulo2EFCore.Entities;
+using System;
+using System.Linq;
+
+namespace EjercicioClase3Modulo2EFCore
 {
     internal class Program
     {
-        static void Main( string[] args )
+        static void Main(string[] args)
         {
-            #region Pasos previos
-            //Ejecutar el script de base de datos en Management Studio para crear la base de datos y la tabla con datos
-            //Instalar Microsoft.EntityFrameworkCore y Microsoft.EntityFrameworkCore.SqlServer
-            //Crear las entidades necesarias
-            //Crear el dbcontext
-            //Configurar aqui el connection string e instanciar el contexto de la base de datos.
-            #endregion
+            using (var context = new ApplicationDbContext())
+            {
+                // Ejercicio 1: Obtener un listado de todos los actores y actrices de la tabla actor
+                var allActors = context.Actor.ToList();
+                Console.WriteLine("Todos los actores y actrices:");
+                foreach (var actor in allActors)
+                {
+                    Console.WriteLine($"{actor.Nombre} {actor.Apellido}");
+                }
 
-            #region ejercicio 1
-            //Obtener un listado de todos los actores y actrices de la tabla actor
+                // Ejercicio 2: Obtener listado de todas las actrices de la tabla actor
+                var allActresses = context.Actor.Where(a => a.Genero == "F").ToList();
+                Console.WriteLine("\nTodas las actrices:");
+                foreach (var actress in allActresses)
+                {
+                    Console.WriteLine($"{actress.Nombre} {actress.Apellido}");
+                }
 
-            #endregion
 
-            #region ejercicio 2
-            //Obtener listado de todas las actrices de la tabla actor
+                // Ejercicio 3: Obtener un listado de todos los actores y actrices mayores de 50 años de la tabla actor
+                var actors50 = context.Actor.Where(a => a.Edad > 50).ToList();
+                Console.WriteLine("\nActores y actrices mayores de 50 años:");
+                foreach (var actor in actors50)
+                {
+                    Console.WriteLine($"{actor.Nombre} {actor.Apellido} - Edad: {actor.Edad}");
+                }
 
-            #endregion
+                // Ejercicio 4: Obtener la edad de la actriz "Julia Roberts"
+                var juliaRoberts = context.Actor.FirstOrDefault(a => a.Nombre == "Julia" && a.Apellido == "Roberts");
+                if (juliaRoberts != null)
+                {
+                    Console.WriteLine($"\nEdad de Julia Roberts: {juliaRoberts.Edad}");
+                }
 
-            #region ejercicio 3
-            //Obtener un listado de todos los actores y actrices mayores de 50 años de la tabla actor
 
-            #endregion
+                // Ejercicio 5: Insertar un nuevo actor en la tabla actor
+                var nuevoActor = new Actor
+                {
+                    Nombre = "Ricardo",
+                    Apellido = "Darin",
+                    Edad = 67,
+                    nombre_artistico = "Ricardo Darin",
+                    Nacionalidad = "argentino",
+                    Genero = "M"
+                };
+                context.Actor.Add(nuevoActor);
+                context.SaveChanges();
+                Console.WriteLine("\nNuevo actor agregado: Ricardo Darin");
+               
 
-            #region ejercicio 4
-            //Obtener la edad de la actriz "Julia Roberts"
+                // Ejercicio 6: Obtener la cantidad de actores y actrices que no son de Estados Unidos
+                var nonUsActorsCount = context.Actor.Count(a => a.Nacionalidad != "USA");
+                Console.WriteLine($"\nCantidad de actores y actrices que no son de Estados Unidos: {nonUsActorsCount}");
 
-            #endregion
-
-            #region ejercicio 5
-            //Insertar un nuevo actor en la tabla actor con los siguientes datos:
-            //nombre: Ricardo
-            //apellido: Darin
-            //edad: 67 años
-            //nombre_artistico: Ricardo Darin
-            //nacionalidad: argentino
-            //género: Masculino.
-
-            #endregion
-
-            #region ejercicio 6
-            //obtener la cantidad de actores y actrices que no son de Estados Unidos.
-
-            #endregion
-
-            #region ejercicio 7
-            //obtener los nombres y apellidos de todos los actores maculinos.
-            #endregion
+                // Ejercicio 7: Obtener los nombres y apellidos de todos los actores masculinos
+                var maleActors = context.Actor.Where(a => a.Genero == "M").Select(a => new { a.Nombre, a.Apellido }).ToList();
+                Console.WriteLine("\nNombres y apellidos de todos los actores masculinos:");
+                foreach (var actor in maleActors)
+                {
+                    Console.WriteLine($"{actor.Nombre} {actor.Apellido}");
+                }
+            }
         }
     }
 }
